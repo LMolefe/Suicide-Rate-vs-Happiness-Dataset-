@@ -51,7 +51,7 @@ JOIN happiness h ON s.Country = h.Country
 WHERE h.Country = 'South Africa'
 GROUP BY year;
 
-SELECT s.Country, s.suicides_no, h.`Happiness Rank`, h.`Economy (GDP per Capita)`
+SELECT s.Country, year, s.suicides_no, h.`Happiness Rank`, h.`Economy (GDP per Capita)`
 FROM suicide s
 LEFT JOIN happiness h ON s.Country = h.Country
 WHERE s.Country = 'South Africa' OR
@@ -71,7 +71,47 @@ Country = 'Russia' OR
 Country = 'India' OR
 Country = 'China' OR
 Country = 'South Africa'
+GROUP BY Country
 ORDER BY `Happiness Rank` ASC;
+
+##using CTE to calculate average GDP of the economy globally, then use CASE statement
+WITH Avg_gdp AS 
+(SELECT AVG(`Economy (GDP per Capita)`) AS avg_gdp
+FROM happiness)
+SELECT
+h.Country, h.`Happiness Rank`, h.`Economy (GDP per Capita)`, h.`Trust (Government Corruption)`, Avg_gdp,
+CASE WHEN AVG(`Economy (GDP per Capita)`) >= 3.15669 THEN 'above average' ELSE 'below average' END AS countries_condition
+FROM happiness h
+JOIN AVG_GDP a 
+GROUP BY Country
+ORDER BY `Happiness Rank` ASC;
+
+##using CTE to calculate average GDP of the economy globally vs BRICS Countries, then use CASE statement
+WITH Avg_gdp AS 
+(SELECT AVG(`Economy (GDP per Capita)`) AS Avg_gdp
+FROM happiness)
+SELECT
+h.Country, h.`Happiness Rank`, h.`Economy (GDP per Capita)`, h.`Trust (Government Corruption)`, Avg_gdp,
+CASE WHEN AVG(`Economy (GDP per Capita)`) >= 3.15669 THEN 'above average' ELSE 'below average' END AS countries_condition
+FROM happiness h
+JOIN AVG_GDP a 
+WHERE Country = 'Brazil' OR
+Country = 'Russia' OR
+Country = 'India' OR
+Country = 'China' OR
+Country = 'South Africa'
+GROUP BY Country
+ORDER BY `Happiness Rank` ASC;
+
+
+SELECT Country, `Happiness Rank`, `Economy (GDP per Capita)`, `Health (Life Expectancy)`,
+CASE 
+	WHEN `Economy (GDP per Capita)` >= 1.20000 THEN 'The country is stable'
+ELSE 'The country unstable'
+END AS condition_country
+FROM happiness
+##WHERE Country = 'South Africa'
+GROUP BY Country;
 
 
 
